@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#C:\Users\beka\OneDrive\Desktop\MajorProjectY4\backend\manage.py
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
