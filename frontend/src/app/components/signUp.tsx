@@ -1,5 +1,3 @@
-//C:\Django-Project\django-frontend\src\app\components\signUp.tsx
-//C:\Django-Project\django-frontend\src\app\components\signUp.tsx
 import { useState } from 'react';
 
 const SignUp = () => {
@@ -8,12 +6,48 @@ const SignUp = () => {
   const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [faceImage, setFaceImage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log('Sign-up form submitted', { firstName, lastName, companyName, email, password });
+  const handleFaceImageCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFaceImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const signupData = { 
+      first_name: firstName,  // Use first_name to match the backend
+      last_name: lastName,    // Use last_name to match the backend
+      companyName, 
+      email, 
+      password, 
+      face_image: faceImage
+    };
+    try {
+      const response = await fetch('http://127.0.0.1:8000/user/signup/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(signupData),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result);
+      } else {
+        console.error('Signup failed');
+      }
+    } catch (error) {
+      console.error('An error occurred', error);
+    }
+  };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
@@ -25,11 +59,9 @@ const SignUp = () => {
         <div className="mt-8 space-y-6">
           <div className="space-y-4">
             <button className="w-full bg-[#2d2d2d] text-white hover:bg-[#3d3d3d] flex items-center justify-center py-2 px-4 rounded">
-              <span className="mr-2 h-4 w-4"></span>
               Sign up with Google
             </button>
             <button className="w-full bg-[#2d2d2d] text-white hover:bg-[#3d3d3d] flex items-center justify-center py-2 px-4 rounded">
-              <span className="mr-2 h-4 w-4"></span>
               Sign up with GitHub
             </button>
           </div>
@@ -111,18 +143,20 @@ const SignUp = () => {
               />
             </div>
             <div>
-              <button type="submit" className="w-full bg-[#48c45a] hover:bg-[#2D4E31] text-white py-2 px-4 rounded">
-                Sign Up
-              </button>
+              <label htmlFor="faceImage" className="sr-only">Face Image</label>
+              <input
+                id="faceImage"
+                name="faceImage"
+                type="file"
+                accept="image/*"
+                onChange={handleFaceImageCapture}
+                className="w-full bg-[#2d2d2d] border border-gray-600 text-white placeholder-gray-400 py-2 px-4 rounded"
+              />
             </div>
+            <button type="submit" className="w-full bg-[#2d2d2d] text-white hover:bg-[#3d3d3d] py-2 px-4 rounded">
+              Sign up
+            </button>
           </form>
-
-          <p className="text-center text-sm text-gray-400">
-            Already have an account?{" "}
-            <a href="/login" className="font-medium text-[#48c45a] hover:text-[#2D4E31]">
-              Sign in
-            </a>
-          </p>
         </div>
       </div>
     </div>
@@ -130,4 +164,3 @@ const SignUp = () => {
 };
 
 export default SignUp;
-
